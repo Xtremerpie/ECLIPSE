@@ -1,0 +1,69 @@
+{
+  "name": "PLAYER",
+  "level": 1,
+  "xp": 0,
+  "next": 100,
+  "rank": "F",
+  "coins": 0,
+  "streak": 0,
+  "done": 0,
+  "stats": {
+    "Knowledge": 1,
+    "Focus": 1,
+    "Discipline": 1,
+    "Creativity": 1,
+    "Courage": 1,
+    "Social": 1
+  },
+  "skills": [],
+  "achievements": [],
+  "titles": [],
+  "inventory": [],
+  "goals": [],
+  "history": [],
+  "day": "2026-08-26",
+  "quests": [
+    {
+      "title": "Deep Work Gate",
+      "desc": "Complete another focused work block.",
+      "stat": "Focus",
+      "xp": 55,
+      "done": false
+    },
+    {
+      "title": "Courage Trial",
+      "desc": "Take one reasonable action you have been avoiding.",
+      "stat": "Courage",
+      "xp": 45,
+      "done": false
+    },
+    {
+      "title": "System Journal",
+      "desc": "Write three lines: win, problem, next move.",
+      "stat": "Discipline",
+      "xp": 30,
+      "done": false
+    },
+    {
+      "title": "Focus Dungeon",
+      "desc": "25 minutes of distraction-free study/work.",
+      "stat": "Focus",
+      "xp": 45,
+      "done": false
+    },
+    {
+      "title": "Social Quest",
+      "desc": "Help someone or have a positive interaction.",
+      "stat": "Social",
+      "xp": 35,
+      "done": false
+    },
+    {
+      "title": "Discipline Trial",
+      "desc": "Finish one useful task you have delayed.",
+      "stat": "Discipline",
+      "xp": 40,
+      "done": false
+    }
+  ]
+}
