@@ -28,4 +28,7 @@ The system is a game layer over voluntary actions. It does not replace judgment,
 Requirement: Python 3.x with Tkinter.
 Save file: eclipse_save.json
 
-# Created by Xtremepie
+# Creator Info
+
+- Created by Xtremerpie
+- Vision - build a solo leveling style system that can save my daily records and  get level-up
