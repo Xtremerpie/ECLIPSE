@@ -1,16 +1,10 @@
 # Changelog
 
-## 2.0.0 — Complete Desktop System
-- Consolidated the dashboard, daily/custom quests, objectives, habits, focus timer, journal, history, and settings into one desktop app.
-- Added the local System Brain, explainable recommendations, achievements, starter skills, attribute progression, and five original story chapters.
-- Added local diagnostics, SQLite backup, portable JSON export, and confirmed JSON restore.
-- Added one-time compatible migration from V1 SQLite data without modifying the original database.
-- Added automated engine/brain tests and Windows/Ubuntu CI coverage.
-
-## 1.1 — System Intelligence
-- Added the deterministic offline System Brain and activity-based recommendations.
-- Added achievement milestones, starter skill unlocks, and progression-gated story fragments.
-
-## 1.0 — The Awakening System
-- Added local SQLite progression, daily directives, XP, ranks, coins, and attributes.
-- Added long-term objectives, original story archive, and legacy profile import.
+## 3.0.0 — System Intelligence & Command Center
+- Replaced the basic tab layout with a polished command-center interface.
+- Added daily pulse check-ins and explainable daily analytics.
+- Added 7/14/30-day analysis windows and analysis inclusion settings.
+- Added focus session history and analytics.
+- Added optional Windows sign-in startup.
+- Extended SQLite schema without deleting existing V2 data.
+- Upgraded portable JSON exports to format version 3 while retaining V2 import compatibility.
