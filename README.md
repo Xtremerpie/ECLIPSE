@@ -1,34 +1,33 @@
-# ECLIPSE — UNKNOWN SYSTEM ULTIMATE
+# ECLIPSE 2.0 — The Complete System
 
-A complete local-first Solo-Leveling-style real-world progression system.
+A lightweight, offline-first desktop progression system by **Xtremerpie**.
 
-START: double-click START_ECLIPSE.bat
+## Run on Windows
+1. Download and extract this branch.
+2. Install Python 3.10+ with Tkinter.
+3. Double-click **START_ECLIPSE_V2.bat**.
+4. Or run: `py -3.14 -m eclipse_v1`
 
-FEATURES
-- Futuristic mysterious HUD
-- XP, levels, F→SS ranks
-- Six attributes: Knowledge, Focus, Discipline, Creativity, Courage, Social
-- Daily real-world quests
-- Random optional challenges
-- Skill tree and titles
-- Achievements
-- Coins
-- Long-term personal goals
-- Persistent local history/archive
-- Daily quest regeneration
-- Mysterious system scans
-- Reset
-- No cloud account
-- No screen surveillance
-- No private-message/file reading
-- No dangerous or automated real-world actions
+No pip packages, GPU, API key, or internet connection are required.
 
-The system is a game layer over voluntary actions. It does not replace judgment, safety rules, school/work requirements, or professional advice.
+## Features
+- Dashboard, player profile, levels, XP, ranks, coins, and eight attributes.
+- Daily directives and custom quests with one-time rewards.
+- Long-term objectives and habit check-ins.
+- Focus timer, private daily journal, and event history.
+- System Brain, achievements, starter skills, and five original story chapters.
+- Settings, six local system checks, SQLite backup, portable JSON export, and restore.
+- One-time compatible migration from the V1 SQLite database without modifying the original file.
 
-Requirement: Python 3.x with Tkinter.
-Save file: eclipse_save.json
+## Data and privacy
+V2 stores progress locally in `%USERPROFILE%\\.eclipse\\eclipse_v2.db`. No screen monitoring, keylogging, private-message reading, cloud account, or automatic device control. The Brain uses only records you enter.
 
-# Creator Info
+## Documentation
+- [Full V2 setup and feature guide](README_V2.md)
+- [Windows feature test checklist](TEST_CHECKLIST_V2.md)
+- [V2 release notes](V2_0_NOTES.md)
 
-- Created by Xtremerpie
-- Vision - build a solo leveling style system that can save my daily records and  get level-up
+## Automated tests
+`py -3.14 -m unittest discover -s tests -v`
+
+The code and automated tests have been exercised in a development environment. Complete the Windows checklist on your PC before treating the desktop build as fully verified.
