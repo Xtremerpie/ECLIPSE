@@ -187,7 +187,7 @@ class EclipseApp:
             self.checkin_detail.configure(text=f"Mood {pulse['mood']}/5  ·  Energy {pulse['energy']}/5  ·  Focus {pulse['focus']}/5\nPriority: {pulse['priority'] or 'Not set'}")
         else:
             self.checkin_state.configure(text="NO CHECK-IN RECORDED TODAY",fg=GOLD);self.checkin_detail.configure(text="A quick pulse gives the System useful context. You can skip it.")
-        self._set_text(self.daily_insight,self.brain.daily_report(days))
+        self._set_text(self.daily_insight,self.brain.daily_report(days,self.engine.get_setting('include_focus','1')=='1',self.engine.get_setting('include_habits','1')=='1'))
         self._set_text(self.growth_text,self.brain.full_report(self.engine.get_setting("include_focus","1")=="1",self.engine.get_setting("include_habits","1")=="1",days))
         for tree in (self.quest_tree,self.goal_tree,self.habit_tree):
             for item in tree.get_children():tree.delete(item)
