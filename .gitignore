@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.eclipse/
+*.db
+*.db-shm
+*.db-wal
+eclipse_v1.db
+eclipse_v2.db
+pre_restore_*.db
+diagnostic_backup.db
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

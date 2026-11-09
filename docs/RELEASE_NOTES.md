@@ -14,5 +14,6 @@ V2.0 consolidates the V1/V1.1 foundation into a complete local desktop experienc
 
 ### Verification
 - Engine tests cover quests, goals, habits, journal persistence, export/restore, SQLite backup, legacy import, and V1 migration.
-- Application source is syntax-compiled. Interactive Windows GUI behavior must still be smoke-tested on the target PC.
+- CI workflow checks Python 3.12 and 3.14 on Windows and Ubuntu.
+- Interactive Windows GUI behavior must still be smoke-tested on the target PC.
 - No cloud services or third-party Python packages are required.

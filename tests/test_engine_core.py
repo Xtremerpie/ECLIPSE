@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from eclipse_v1.engine import EclipseEngine
+from eclipse.engine import EclipseEngine
 
 
 class EclipseEngineTests(unittest.TestCase):

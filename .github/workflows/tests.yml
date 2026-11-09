@@ -1,7 +1,7 @@
-name: ECLIPSE V2 tests
+name: ECLIPSE tests
 on:
   push:
-    branches: [eclipse-v2-complete-desktop]
+    branches: [main]
   pull_request:
     branches: [main]
 jobs:
@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Compile application
-        run: python -m compileall -q eclipse_v1
+        run: python -m compileall -q eclipse
       - name: Run automated tests
         run: python -m unittest discover -s tests -v
       - name: Check Tkinter availability on Windows

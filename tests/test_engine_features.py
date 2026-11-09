@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from eclipse_v1.engine import EclipseEngine
+from eclipse.engine import EclipseEngine
 
 class EngineV2Tests(unittest.TestCase):
  def setUp(self):

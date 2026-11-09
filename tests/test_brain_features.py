@@ -1,7 +1,7 @@
 import tempfile,unittest
 from pathlib import Path
-from eclipse_v1.engine import EclipseEngine
-from eclipse_v1.brain import SystemBrain
+from eclipse.engine import EclipseEngine
+from eclipse.brain import SystemBrain
 class BrainTests(unittest.TestCase):
  def test_read_only_and_unlocks(self):
   with tempfile.TemporaryDirectory() as d:

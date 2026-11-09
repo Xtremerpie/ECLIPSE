@@ -2,8 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from eclipse_v1.engine import EclipseEngine
-from eclipse_v1.brain import SystemBrain
+from eclipse.engine import EclipseEngine
+from eclipse.brain import SystemBrain
 
 
 class SystemBrainTests(unittest.TestCase):

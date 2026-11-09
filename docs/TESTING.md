@@ -1,6 +1,6 @@
 # ECLIPSE 2.0 — Windows test checklist
 
-Run START_ECLIPSE_V2.bat and check each item only after seeing it work on your PC.
+Launch ECLIPSE with START_ECLIPSE.bat. Mark each item only after confirming it on your PC.
 
 ## Launch and data
 - [ ] App opens without a Python/Tkinter error.
