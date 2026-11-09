@@ -41,7 +41,7 @@ class SystemBrain:
         return "\n".join(lines)
     def full_report(self,include_focus=True,include_habits=True,days=7):
         s=self.snapshot();attrs=s["player"]["attributes"]
-        lines=["ECLIPSE SYSTEM INTELLIGENCE","="*36,"","CHARACTER PROFILE",
+        lines=["ECLIPSE SYSTEM INTELLIGENCE","="*36,self.daily_report(days,include_focus,include_habits),"","CHARACTER PROFILE",
         f"Player: {s['player']['name']}",f"Level {s['player']['level']} · Rank {s['player']['rank']} · {s['player']['xp']} total XP",
         f"Most practised recorded attribute: {s['strongest_attribute']}",f"Least practised recorded attribute: {s['weakest_attribute']}","","ATTRIBUTE MATRIX"]
         lines += [f"{k}: {v}" for k,v in attrs.items()]
