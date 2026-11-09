@@ -180,7 +180,7 @@ class EclipseApp:
         self.hero_greeting.configure(text=f"WELCOME BACK, {player['name'].upper()}");self.level_line.configure(text=f"LEVEL {player['level']}  ·  RANK {player['rank']}")
         self.xp_line.configure(text=f"{player['level_xp']} / {player['next_xp']} XP TO NEXT LEVEL");self.level_bar["value"]=player["level_xp"]/player["next_xp"]*100
         self.metric_labels["xp"].configure(text=f"{player['xp']:,}");self.metric_labels["quests"].configure(text=str(a["quest_count"]))
-        self.metric_labels["habits"].configure(text=str(a["habit_count"]));self.metric_labels["focus"].configure(text=f"{a['focus_minutes']}m")
+        self.metric_labels["habits"].configure(text=str(a["habit_count"] if self.engine.get_setting("include_habits","1")=="1" else 0));self.metric_labels["focus"].configure(text=f"{a['focus_minutes'] if self.engine.get_setting('include_focus','1')=='1' else 0}m")
         pulse=self.engine.daily_checkin()
         if pulse:
             self.checkin_state.configure(text="TODAY'S PULSE RECORDED",fg=GREEN)
@@ -285,7 +285,7 @@ class EclipseApp:
     def save_reflection(self):
         self.engine.save_reflection(self.journal_text.get("1.0","end").strip());self.refresh_all();messagebox.showinfo("Journal","Reflection saved locally.",parent=self.root)
     def _save_setting(self,key,value):
-        self.engine.set_setting(key,str(value));self.status.configure(text=f"SETTING SAVED  ·  {key.replace('_',' ').upper()}")
+        self.engine.set_setting(key,str(value));self.status.configure(text=f"SETTING SAVED  ·  {key.replace('_',' ').upper()}");self.refresh_all()
     def toggle_auto_start(self):
         enabled=bool(self.auto_start_var.get())
         try:self._set_windows_startup(enabled);self.engine.set_setting("auto_start","1" if enabled else "0");self.status.configure(text="WINDOWS STARTUP ENABLED" if enabled else "WINDOWS STARTUP DISABLED")
