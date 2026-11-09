@@ -1,2 +1,2 @@
-"""ECLIPSE V1: The Awakening System."""
-__version__ = "1.0.0"
+"""ECLIPSE desktop progression system."""
+__version__ = "2.0.0"
