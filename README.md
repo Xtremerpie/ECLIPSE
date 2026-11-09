@@ -1,66 +1,53 @@
-# ECLIPSE 2.0 — The Complete System
+# ECLIPSE 3.0 — Personal Progression System
 
-**A lightweight, offline-first personal progression desktop app by Xtremerpie.**
+**A polished, offline-first Windows desktop progression system by Xtremerpie.**
 
-ECLIPSE turns actions you choose to record into quests, XP, levels, attributes, goals, habits, achievements, skills, story unlocks, and a private activity history. It is a motivational tool—not a measure of your worth.
+ECLIPSE combines a Solo-Leveling-inspired progression interface with daily reflection and explainable personal analytics. It records only what you choose to do inside the app.
 
-## Quick start (Windows)
-
-1. Download this repository using **Code → Download ZIP**, then extract it.
-2. Install Python 3.10+ with **Tkinter** enabled (Python 3.14 is supported).
-3. Double-click **START_ECLIPSE.bat**.
-
-Or open PowerShell in the extracted project folder:
-
-```powershell
-py -3.14 -m eclipse
-```
-
-No pip packages, API key, GPU, or internet connection are required. ECLIPSE uses Python's standard library.
+## What's new in 3.0
+- Redesigned command-center UI with navigation sidebar, dashboard cards, progress display, and custom ECLIPSE mark.
+- Daily pulse check-in on launch (once per day, optional): mood, energy, focus, a small win, a challenge, and today's priority.
+- Daily intelligence report based on check-ins and in-app activity.
+- 7, 14, or 30-day analysis windows.
+- Focus sessions recorded when the timer completes.
+- Optional Windows sign-in startup setting.
+- Settings for automatic check-ins and analysis inputs.
+- Existing V2 data is preserved; new database tables are added automatically.
 
 ## Features
+- Dashboard, directives, objectives, habits, focus room, System Intelligence, story archive, journal, activity log, and settings.
+- XP, levels, ranks, coins, eight attributes, achievements, and skills.
+- Local SQLite storage, backups, portable JSON export/restore, and diagnostics.
 
-- **Dashboard:** player profile, level, XP, rank, coins, eight attributes, and activity overview.
-- **Quests:** five daily directives, custom quests, attribute progression, and one-time rewards.
-- **Goals:** add, complete, and remove long-term objectives.
-- **Habits:** daily check-ins, archive support, and no missed-day penalties.
-- **Focus Room:** 5, 15, 25, 45, and 60-minute timer with start, pause, and reset.
-- **System Brain:** explainable recommendations based only on records you enter.
-- **Growth:** achievements, starter skills, attribute statistics, and progression milestones.
-- **Story Archive:** five original chapters unlocked through recorded progress.
-- **Journal and History:** private daily reflections and a timeline of recorded actions.
-- **Settings:** rename player, six local system checks, open data folder, SQLite backup, portable JSON export, and confirmed restore.
+## Quick start on Windows
+1. Download this repository using Code → Download ZIP and extract it.
+2. Install Python 3.10+ with Tkinter enabled (Python 3.14 is supported).
+3. Double-click START_ECLIPSE.bat.
 
-## Your data
+PowerShell command from the extracted project folder: py -3.14 -m eclipse
 
-The app stores its active database locally at:
+No pip packages, API key, GPU, or internet connection are required.
 
-`%USERPROFILE%\.eclipse\eclipse_v2.db`
+## Daily analysis: what it can and cannot do
+When ECLIPSE opens, it records an app-open event. If enabled, it asks for one short daily pulse. The System combines self-reported mood, energy and focus with completed directives, goals, habit check-ins, and completed focus timer sessions. It can identify simple trends and suggest a realistic next step.
 
-If an older `eclipse_v1.db` is present in the project folder, ECLIPSE can import compatible records once without modifying that source database. The legacy `eclipse_save.json` file is also read-only during import. Keep backups before changing or moving old project data.
+It cannot know what you did outside the app, verify a goal, read other apps, monitor keystrokes, capture your screen, or infer your feelings. Goal completion remains an explicit confirmation. Journal text is always excluded from analysis.
 
-## Run automated tests
+## Windows sign-in startup
+Open System Settings → Windows Startup and enable the option. ECLIPSE adds a launcher to your Windows Startup folder. Disable the same option to remove it. This currently supports Windows only.
 
-```powershell
-py -3.14 -m unittest discover -s tests -v
-```
+## Data and privacy
+The active database is stored at %USERPROFILE%\.eclipse\eclipse_v2.db.
+ECLIPSE is local-first and does not require a cloud account or make network requests.
 
-Then complete the [Windows test checklist](docs/TESTING.md).
+## Tests
+Run: py -3.14 -m unittest discover -s tests -v
+Then complete the Windows GUI checklist in docs/TESTING.md.
 
 ## Project layout
-
-- `eclipse/` — application, progression engine, and local System Brain.
-- `tests/` — automated engine and System Brain tests.
-- `docs/` — Windows test checklist, release notes, and architecture.
-- `legacy/` — archived original single-file prototype.
-- `START_ECLIPSE.bat` — Windows launcher.
-
-## Privacy and limitations
-
-- No cloud account, network calls, screen surveillance, keylogging, or private-message reading.
-- No automatic device control or covert verification of activities.
-- XP is awarded only after an explicit action inside ECLIPSE.
-- The focus timer measures elapsed time; it cannot verify what happened during a session.
-- Rafail AI is not required for ECLIPSE 2.0 and is not integrated in this release.
-
-**Target:** lightweight Windows desktop. Automated tests do not replace the manual Windows GUI checklist on your own PC.
+- eclipse/ — application, progression engine, and System Brain.
+- tests/ — automated engine and Brain tests.
+- docs/ — testing, release notes, and architecture.
+- assets/ — ECLIPSE vector logo.
+- legacy/ — archived original prototype.
+- START_ECLIPSE.bat — Windows launcher.
