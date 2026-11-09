@@ -11,7 +11,7 @@ from .brain import SystemBrain
 BG='#080d18'; PANEL='#111b2d'; PANEL2='#17263b'; CYAN='#55e6f2'; TEXT='#e7f2ff'; MUTED='#8da3b8'; GREEN='#9ce6b0'; RED='#ff8c8c'
 class EclipseApp:
  def __init__(self,root):
-  self.root=root;self.root.title('ECLIPSE 2.0 — The Complete System');self.root.geometry('1160x780');self.root.minsize(850,620);self.root.configure(bg=BG)
+  self.root=root;self.root.title('ECLIPSE 2.0 — The Complete System');self.root.geometry('1080x700');self.root.minsize(820,560);self.root.configure(bg=BG)
   self.data_dir=Path.home()/'.eclipse';self.data_dir.mkdir(exist_ok=True);self.engine=EclipseEngine(self.data_dir/'eclipse_v2.db',Path.cwd()/'eclipse_save.json',Path.cwd()/'eclipse_v1.db');self.brain=SystemBrain(self.engine)
   self.timer_job=None;self.timer_remaining=25*60;self.timer_running=False
   self._style();self._layout();self.refresh_all();self.root.protocol('WM_DELETE_WINDOW',self.close)
