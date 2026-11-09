@@ -67,8 +67,11 @@ class EclipseEngine:
         counts={r["kind"]:r["total"] for r in rows}
         focus=self.conn.execute("SELECT COALESCE(SUM(minutes),0) FROM focus_sessions WHERE day BETWEEN ? AND ? AND completed=1",(start,end)).fetchone()[0]
         checkins=self.conn.execute("SELECT COUNT(*) FROM daily_checkins WHERE day BETWEEN ? AND ?",(start,end)).fetchone()[0]
+        pulse=self.conn.execute("SELECT AVG(mood) AS mood,AVG(energy) AS energy,AVG(focus) AS focus FROM daily_checkins WHERE day BETWEEN ? AND ?",(start,end)).fetchone()
         return {"days":days,"start":start,"end":end,"quest_count":counts.get("quest_completed",0),"habit_count":counts.get("habit_completed",0),
-        "focus_minutes":focus,"checkin_count":checkins,"goal_count":counts.get("goal_completed",0),"session_count":counts.get("app_opened",0),"events":counts}
+        "focus_minutes":focus,"checkin_count":checkins,"avg_mood":round(pulse["mood"],1) if pulse["mood"] is not None else None,
+        "avg_energy":round(pulse["energy"],1) if pulse["energy"] is not None else None,"avg_focus":round(pulse["focus"],1) if pulse["focus"] is not None else None,
+        "goal_count":counts.get("goal_completed",0),"session_count":counts.get("app_opened",0),"events":counts}
     def _import_legacy(self,path):
         if self.conn.execute("SELECT 1 FROM events WHERE kind='legacy_import' LIMIT 1").fetchone() or not path.exists():return
         try:
