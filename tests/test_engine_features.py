@@ -25,4 +25,24 @@ class EngineV2Tests(unittest.TestCase):
   old=self.root/'eclipse_save.json';raw='{"name":"Legacy","xp":120,"coins":9,"stats":{"Focus":4}}';old.write_text(raw,encoding='utf8');self.e.close();self.e=EclipseEngine(self.root/'legacy.db',old);self.assertEqual(self.e.player()['name'],'Legacy');self.assertEqual(old.read_text(encoding='utf8'),raw)
  def test_v1_database_migration_is_read_only(self):
   old_path=self.root/'old.db';old=EclipseEngine(old_path,self.root/'no-old-save.json');old.rename_player('V1 Player');old.add_goal('Existing milestone');q=old.quests()[0];old.complete_quest(q['id']);old.close();before=old_path.read_bytes();new=EclipseEngine(self.root/'new.db',self.root/'missing.json',old_path);self.assertEqual(new.player()['name'],'V1 Player');self.assertGreaterEqual(new.player()['xp'],q['xp']);self.assertTrue(any(g['title']=='Existing milestone' for g in new.goals()));self.assertEqual(old_path.read_bytes(),before);new.close()
+
+ def test_daily_pulse_and_settings_persist(self):
+  self.e.save_daily_checkin(mood=4,energy=3,focus=5,win='Finished a task',challenge='Distraction',priority='Study')
+  pulse=self.e.daily_checkin()
+  self.assertEqual(pulse['mood'],4);self.assertEqual(pulse['priority'],'Study')
+  self.e.set_setting('analysis_window','14')
+  self.assertEqual(self.e.get_setting('analysis_window'),'14')
+ def test_focus_session_and_analytics(self):
+  self.e.record_focus_session(25,True);self.e.log_session('app_opened','Test session')
+  data=self.e.analytics_snapshot(7)
+  self.assertEqual(data['focus_minutes'],25);self.assertGreaterEqual(data['session_count'],1)
+ def test_v2_export_import_compatibility(self):
+  import json
+  out=self.root/'v2.json';tables={}
+  for table in ('player','attributes','quests','events','goals','habits','habit_logs','reflections'):
+   tables[table]=[dict(row) for row in self.e.conn.execute('SELECT * FROM '+table)]
+  out.write_text(json.dumps({'app':'ECLIPSE','format_version':2,'tables':tables}),encoding='utf8')
+  self.e.rename_player('After V2');self.e.import_json(out)
+  self.assertEqual(self.e.player()['name'],'Player')
+
 if __name__=='__main__':unittest.main()
