@@ -1,30 +1,30 @@
-# ECLIPSE 2.0 — Windows test checklist
+# ECLIPSE 3.0 test checklist
 
-Launch ECLIPSE with START_ECLIPSE.bat. Mark each item only after confirming it on your PC.
+## First launch
+- [ ] Start with START_ECLIPSE.bat.
+- [ ] Confirm sidebar, dashboard, level progress, and status line render.
+- [ ] Confirm existing V2 profile, XP, goals, habits, and history remain available.
+- [ ] If daily check-in is enabled and none exists for today, confirm the pulse opens.
+- [ ] Save a pulse and confirm it appears on the dashboard and in System Intelligence.
 
-## Launch and data
-- [ ] App opens without a Python/Tkinter error.
-- [ ] Close and reopen; name, XP, quests, goals, habits, and journal remain saved.
-- [ ] If V1 data exists, compatible records appear in V2.
-- [ ] The old eclipse_v1.db file has not been modified.
+## Core features
+- [ ] Complete one directive and confirm XP updates once.
+- [ ] Add an objective, then confirm it only when genuinely complete.
+- [ ] Add a habit and record a daily check-in.
+- [ ] Run a focus timer to completion and confirm a focus record appears.
+- [ ] Save a journal entry and confirm it persists after restart.
+- [ ] Confirm journal contents do not appear in System Intelligence.
 
-## Progression
-- [ ] Complete a daily quest; XP, coins, and its attribute increase.
-- [ ] Complete that quest again; no second reward is granted.
-- [ ] Add and complete a custom quest.
-- [ ] Add and complete an objective; its reward is granted once.
-- [ ] Add another objective and remove it while active.
-- [ ] Add a habit and check in; a second same-day check-in is rejected.
-- [ ] Archive a habit; its past check-ins remain in history/statistics.
+## Settings
+- [ ] Change analysis window between 7, 14, and 30 days.
+- [ ] Toggle automatic daily check-in.
+- [ ] Toggle focus and habit inclusion.
+- [ ] On Windows, enable sign-in startup and verify ECLIPSE_STARTUP.vbs appears in the Startup folder.
+- [ ] Disable sign-in startup and verify the VBS launcher is removed.
+- [ ] Run diagnostics and confirm all checks pass.
+- [ ] Export JSON, then restore it after creating a safety backup.
 
-## Other features
-- [ ] Start, pause, resume, and reset the focus timer.
-- [ ] Save a journal note, restart the app, and confirm it remains.
-- [ ] Review System Brain, achievements, skills, story, and history.
-- [ ] Rename the player and confirm the name persists.
-- [ ] Run System Check and confirm all six checks pass.
-- [ ] Export a portable JSON backup and make a SQLite backup.
-- [ ] Restore JSON and confirm a safety backup is created first.
-
-## If something fails
-Send the exact error text or a screenshot and mention which checklist item failed. Do not delete your .eclipse folder or old V1 database while troubleshooting.
+## Privacy and performance
+- [ ] Confirm the app works offline.
+- [ ] Confirm no screen, keyboard, or other-app monitoring is performed.
+- [ ] Confirm the app remains responsive on a low-spec PC.
