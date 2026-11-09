@@ -1,11 +1,11 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title ECLIPSE 2.0
+title ECLIPSE 3.0
 echo.
 echo  ==========================================
 echo          E C L I P S E   2.0
-echo          THE COMPLETE SYSTEM
+echo          PERSONAL PROGRESSION SYSTEM
 echo  ==========================================
 echo.
 where py >nul 2>nul
