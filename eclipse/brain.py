@@ -19,11 +19,15 @@ class SystemBrain:
         return {"player":p,"quest_records":q,"goal_records":counts["goal_completed"],"event_count":len(events),"strongest_attribute":strongest,"weakest_attribute":weakest,
         "recommendation":advice,"achievements":[{"title":a,"description":d,"unlocked":u} for a,d,u in achievements],
         "skills":[{"title":n,"attribute":a,"value":attrs.get(a,1),"unlocked":attrs.get(a,1)>=3} for n,a in skills],"chapters":chapters}
-    def daily_report(self,days=7):
+    def daily_report(self,days=7,include_focus=True,include_habits=True):
         d=self.engine.analytics_snapshot(days);pulse=self.engine.daily_checkin()
+        if not include_focus:d["focus_minutes"]=0
+        if not include_habits:d["habit_count"]=0
         lines=[f"ANALYSIS WINDOW · LAST {d['days']} DAYS",f"{d['start']} → {d['end']}","",f"Directives completed: {d['quest_count']}",
         f"Habit check-ins: {d['habit_count']}",f"Completed focus time: {d['focus_minutes']} minutes",f"Daily pulses recorded: {d['checkin_count']}",
         f"Objectives completed: {d['goal_count']}",""]
+        if d["checkin_count"]:
+            lines.append(f"PERIOD PULSE AVERAGE: Mood {d['avg_mood']}/5 · Energy {d['avg_energy']}/5 · Focus {d['avg_focus']}/5")
         if pulse:
             lines += ["TODAY'S SELF-REPORTED PULSE",f"Mood {pulse['mood']}/5 · Energy {pulse['energy']}/5 · Focus {pulse['focus']}/5",
             f"Win: {pulse['win'] or 'Not recorded'}",f"Challenge: {pulse['challenge'] or 'Not recorded'}",f"Priority: {pulse['priority'] or 'Not recorded'}",""]
@@ -37,7 +41,7 @@ class SystemBrain:
         return "\n".join(lines)
     def full_report(self,include_focus=True,include_habits=True,days=7):
         s=self.snapshot();attrs=s["player"]["attributes"]
-        lines=["ECLIPSE SYSTEM INTELLIGENCE","="*36,self.daily_report(days),"","CHARACTER PROFILE",
+        lines=["ECLIPSE SYSTEM INTELLIGENCE","="*36,"","CHARACTER PROFILE",
         f"Player: {s['player']['name']}",f"Level {s['player']['level']} · Rank {s['player']['rank']} · {s['player']['xp']} total XP",
         f"Most practised recorded attribute: {s['strongest_attribute']}",f"Least practised recorded attribute: {s['weakest_attribute']}","","ATTRIBUTE MATRIX"]
         lines += [f"{k}: {v}" for k,v in attrs.items()]
