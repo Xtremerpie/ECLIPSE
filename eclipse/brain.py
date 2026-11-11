@@ -49,13 +49,16 @@ class SystemBrain:
             "chapters": chapters
         }
 
-    def daily_report(self, days=7, include_focus=True, include_habits=True):
+    def daily_report(self, days=7, include_focus=True, include_habits=True, include_checkins=True, include_goals=True):
         d = self.engine.analytics_snapshot(days)
         pulse = self.engine.daily_checkin()
         habits = d["habit_count"] if include_habits else 0
         prev_habits = d["previous_habit_count"] if include_habits else 0
         focus = d["focus_minutes"] if include_focus else 0
         prev_focus = d["previous_focus_minutes"] if include_focus else 0
+        goal_count = d["goal_count"] if include_goals else 0
+        previous_goal_count = d["previous_goal_count"] if include_goals else 0
+        checkin_count = d["checkin_count"] if include_checkins else 0
         lines = [
             f"ANALYSIS WINDOW  ·  LAST {d['days']} DAYS",
             f"{d['start']}  →  {d['end']}",
@@ -64,8 +67,8 @@ class SystemBrain:
             f"Directives completed       {d['quest_count']}  (previous period: {d['previous_quest_count']})",
             f"Habit check-ins            {habits}  (previous period: {prev_habits})",
             f"Completed focus time       {focus} min  (previous period: {prev_focus} min)",
-            f"Objectives completed       {d['goal_count']}  (previous period: {d['previous_goal_count']})",
-            f"Daily pulses recorded      {d['checkin_count']}",
+            f"Objectives completed       {goal_count}  (previous period: {previous_goal_count})",
+            f"Daily pulses recorded      {checkin_count}",
             ""
         ]
         def trend(current, previous):
@@ -82,11 +85,11 @@ class SystemBrain:
             f"Focus time is {trend(focus, prev_focus)}.",
             ""
         ]
-        if d["checkin_count"]:
+        if include_checkins and d["checkin_count"]:
             lines.append(
                 f"AVERAGE SELF-REPORTED PULSE  ·  Mood {d['avg_mood']}/5  ·  Energy {d['avg_energy']}/5  ·  Focus {d['avg_focus']}/5"
             )
-        if pulse:
+        if include_checkins and pulse:
             lines += [
                 "", "TODAY'S SELF-REPORTED PULSE",
                 f"Mood {pulse['mood']}/5  ·  Energy {pulse['energy']}/5  ·  Focus {pulse['focus']}/5",
@@ -100,8 +103,10 @@ class SystemBrain:
                 lines.append("SYSTEM SUGGESTION: Protect one focused block, then take a proper break.")
             else:
                 lines.append("SYSTEM SUGGESTION: Choose one clear priority. A realistic plan beats an overloaded one.")
-        else:
+        elif include_checkins:
             lines.append("No daily pulse has been recorded today. The System will not guess how you feel.")
+        else:
+            lines.append("Daily pulse analysis is disabled in System Settings.")
         activity = self.engine.activity_by_day(min(days, 7))
         if activity:
             lines += ["", "RECENT DAILY ACTIVITY  ·  Q=directives  H=habits  F=focus minutes"]
@@ -110,7 +115,7 @@ class SystemBrain:
                 h = item["habits"] if include_habits else 0
                 f = item["focus_minutes"] if include_focus else 0
                 lines.append(f"{item['day']}   Q {q:>2}   H {h:>2}   F {f:>3}m")
-        if d["quest_count"] == 0 and habits == 0 and focus == 0 and d["goal_count"] == 0:
+        if d["quest_count"] == 0 and habits == 0 and focus == 0 and goal_count == 0:
             lines += ["", "SIGNAL STATUS: Not enough recent activity to identify a pattern. Start with one small action."]
         else:
             lines += ["", "SIGNAL STATUS: Records are available. Trends are descriptive, not a judgement or diagnosis."]
@@ -122,12 +127,12 @@ class SystemBrain:
         ]
         return "\n".join(lines)
 
-    def full_report(self, include_focus=True, include_habits=True, days=7):
+    def full_report(self, include_focus=True, include_habits=True, days=7, include_checkins=True, include_goals=True):
         s = self.snapshot()
         attrs = s["player"]["attributes"]
         lines = [
             "ECLIPSE SYSTEM INTELLIGENCE", "=" * 36,
-            self.daily_report(days, include_focus, include_habits),
+            self.daily_report(days, include_focus, include_habits, include_checkins, include_goals),
             "", "CHARACTER PROFILE",
             f"Player: {s['player']['name']}",
             f"Level {s['player']['level']} · Rank {s['player']['rank']} · {s['player']['xp']} total XP",
