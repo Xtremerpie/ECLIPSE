@@ -68,7 +68,7 @@ class SystemBrain:
             f"Habit check-ins            {habits}  (previous period: {prev_habits})",
             f"Completed focus time       {focus} min  (previous period: {prev_focus} min)",
             f"Objectives completed       {goal_count}  (previous period: {previous_goal_count})",
-            f"Daily pulses recorded      {checkin_count}",
+            f"Daily pulses recorded      {checkin_count if include_checkins else 'excluded by settings'}",
             ""
         ]
         def trend(current, previous):
@@ -78,13 +78,14 @@ class SystemBrain:
             if delta < 0:
                 return f"down by {abs(delta)} compared with the previous period"
             return "unchanged compared with the previous period"
-        lines += [
-            "PERIOD COMPARISON",
-            f"Directive activity is {trend(d['quest_count'], d['previous_quest_count'])}.",
-            f"Habit activity is {trend(habits, prev_habits)}.",
-            f"Focus time is {trend(focus, prev_focus)}.",
-            ""
-        ]
+        lines += ["PERIOD COMPARISON", f"Directive activity is {trend(d['quest_count'], d['previous_quest_count'])}."]
+        if include_habits:lines.append(f"Habit activity is {trend(habits, prev_habits)}.")
+        else:lines.append("Habit activity comparison is disabled in settings.")
+        if include_focus:lines.append(f"Focus time is {trend(focus, prev_focus)}.")
+        else:lines.append("Focus comparison is disabled in settings.")
+        if include_goals:lines.append(f"Objective activity is {trend(goal_count, previous_goal_count)}.")
+        else:lines.append("Objective comparison is disabled in settings.")
+        lines.append("")
         if include_checkins and d["checkin_count"]:
             lines.append(
                 f"AVERAGE SELF-REPORTED PULSE  ·  Mood {d['avg_mood']}/5  ·  Energy {d['avg_energy']}/5  ·  Focus {d['avg_focus']}/5"
