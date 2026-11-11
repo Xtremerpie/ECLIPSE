@@ -1,4 +1,4 @@
-"""ECLIPSE 3.0 — a polished, local-first personal progression system."""
+"""ECLIPSE 3.1 — a polished, local-first personal progression system."""
 from __future__ import annotations
 import os, sys, base64, math
 from datetime import date, datetime
@@ -13,7 +13,7 @@ ACCENT="#77E5E8"; VIOLET="#9B8CFF"; GOLD="#F2C879"; TEXT="#EEF4FF"; MUTED="#91A2
 class EclipseApp:
     NAV=[("OVERVIEW","dashboard","◈"),("DAILY DIRECTIVES","quests","✦"),("OBJECTIVES","goals","◎"),("HABITS","habits","↗"),("FOCUS ROOM","focus","◷"),("SYSTEM INTELLIGENCE","growth","⌁"),("STORY ARCHIVE","story","▤"),("DAILY JOURNAL","journal","✎"),("ACTIVITY LOG","history","≡"),("SYSTEM SETTINGS","settings","⚙")]
     def __init__(self,root):
-        self.root=root;root.title("ECLIPSE 3.0 | Personal Progression System");root.geometry("1320x850");root.minsize(980,680);root.configure(bg=BG)
+        self.root=root;root.title("ECLIPSE 3.1 | Personal Progression System");root.geometry("1320x850");root.minsize(980,680);root.configure(bg=BG)
         self.data_dir=Path.home()/".eclipse";self.data_dir.mkdir(exist_ok=True)
         self.engine=EclipseEngine(self.data_dir/"eclipse_v2.db",Path.cwd()/"eclipse_save.json",Path.cwd()/"eclipse_v1.db")
         self.brain=SystemBrain(self.engine);self.pages={};self.page_containers={};self.nav_buttons={};self.timer_job=None;self.timer_remaining=1500;self.timer_elapsed=0;self.timer_running=False
@@ -68,7 +68,7 @@ class EclipseApp:
         self.date_label=tk.Label(right,text="",bg=BG,fg=MUTED,font=(FONT,9));self.date_label.pack(side="right",padx=(12,0))
         tk.Label(right,text="●  LOCAL INSTANCE",bg=BG,fg=GREEN,font=(FONT,8,"bold")).pack(side="right")
         self.content=tk.Frame(main,bg=BG);self.content.pack(fill="both",expand=True,padx=26,pady=(0,20))
-        self.status=tk.Label(main,text="ECLIPSE 3.0  ·  DATA STORED ON THIS DEVICE",bg=BG,fg="#64748B",font=(FONT,7));self.status.pack(anchor="e",padx=28,pady=(0,9))
+        self.status=tk.Label(main,text="ECLIPSE 3.1  ·  DATA STORED ON THIS DEVICE",bg=BG,fg="#64748B",font=(FONT,7));self.status.pack(anchor="e",padx=28,pady=(0,9))
     def _page(self,key):
         outer=tk.Frame(self.content,bg=BG)
         canvas=tk.Canvas(outer,bg=BG,highlightthickness=0,bd=0)
@@ -394,7 +394,7 @@ class EclipseApp:
         for name,fn in tests:
             try:checks.append((name,bool(fn())))
             except Exception:checks.append((name,False))
-        out="ECLIPSE 3.0 SYSTEM DIAGNOSTICS\n"+"="*38+"\n"+"\n".join(("PASS  " if ok else "FAIL  ")+name for name,ok in checks)
+        out="ECLIPSE 3.1 SYSTEM DIAGNOSTICS\n"+"="*38+"\n"+"\n".join(("PASS  " if ok else "FAIL  ")+name for name,ok in checks)
         out+=f"\n\nRESULT: {sum(ok for _,ok in checks)}/{len(checks)} checks passed.\nPython: {sys.version.split()[0]} · Platform: {sys.platform}\nTk: {self.root.tk.call('info','patchlevel')}\nDatabase: {self.engine.db_path}"
         self._set_text(self.check_text,out)
     def _test_backup(self):
