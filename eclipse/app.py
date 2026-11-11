@@ -368,7 +368,7 @@ class EclipseApp:
             executable=pyw;arguments=f" -{sys.version_info.major}.{sys.version_info.minor} -m eclipse"
         project=Path(__file__).resolve().parent.parent
         qproj=str(project).replace('"','""');qexe=executable.replace('"','""')
-        vbs.write_text('Set shell = CreateObject("WScript.Shell")\\n'+f'shell.CurrentDirectory = "{qproj}"\\n'+f'shell.Run Chr(34) & "{qexe}" & Chr(34) & "{arguments}", 0, False\\n',encoding="utf-8")
+        vbs.write_text('Set shell = CreateObject("WScript.Shell")\n'+f'shell.CurrentDirectory = "{qproj}"\n'+f'shell.Run Chr(34) & "{qexe}" & Chr(34) & "{arguments}", 0, False\n',encoding="utf-8")
     def rename_player(self):
         name=simpledialog.askstring("Player profile","Choose your player name:",initialvalue=self.engine.player()["name"],parent=self.root)
         if name:self.engine.rename_player(name);self.refresh_all()
