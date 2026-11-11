@@ -68,10 +68,30 @@ class EclipseEngine:
         focus=self.conn.execute("SELECT COALESCE(SUM(minutes),0) FROM focus_sessions WHERE day BETWEEN ? AND ? AND completed=1",(start,end)).fetchone()[0]
         checkins=self.conn.execute("SELECT COUNT(*) FROM daily_checkins WHERE day BETWEEN ? AND ?",(start,end)).fetchone()[0]
         pulse=self.conn.execute("SELECT AVG(mood) AS mood,AVG(energy) AS energy,AVG(focus) AS focus FROM daily_checkins WHERE day BETWEEN ? AND ?",(start,end)).fetchone()
-        return {"days":days,"start":start,"end":end,"quest_count":counts.get("quest_completed",0),"habit_count":counts.get("habit_completed",0),
+        previous_end=today-timedelta(days=days);previous_start=previous_end-timedelta(days=days-1)
+        previous_rows=self.conn.execute("SELECT kind,COUNT(*) AS total FROM events WHERE substr(created_at,1,10) BETWEEN ? AND ? GROUP BY kind",(previous_start.isoformat(),previous_end.isoformat())).fetchall()
+        previous={r["kind"]:r["total"] for r in previous_rows}
+        previous_focus=self.conn.execute("SELECT COALESCE(SUM(minutes),0) FROM focus_sessions WHERE day BETWEEN ? AND ? AND completed=1",(previous_start.isoformat(),previous_end.isoformat())).fetchone()[0]
+        return {"days":days,"start":start,"end":end,"previous_start":previous_start.isoformat(),"previous_end":previous_end.isoformat(),
+        "quest_count":counts.get("quest_completed",0),"habit_count":counts.get("habit_completed",0),
         "focus_minutes":focus,"checkin_count":checkins,"avg_mood":round(pulse["mood"],1) if pulse["mood"] is not None else None,
         "avg_energy":round(pulse["energy"],1) if pulse["energy"] is not None else None,"avg_focus":round(pulse["focus"],1) if pulse["focus"] is not None else None,
-        "goal_count":counts.get("goal_completed",0),"session_count":counts.get("app_opened",0),"events":counts}
+        "goal_count":counts.get("goal_completed",0),"session_count":counts.get("app_opened",0),"events":counts,
+        "previous_quest_count":previous.get("quest_completed",0),"previous_habit_count":previous.get("habit_completed",0),
+        "previous_goal_count":previous.get("goal_completed",0),"previous_focus_minutes":previous_focus,"previous_events":previous}
+    def activity_by_day(self,days=7):
+        days=max(1,min(90,int(days)));today=date.today()
+        start=(today-timedelta(days=days-1)).isoformat()
+        rows=self.conn.execute("""SELECT substr(created_at,1,10) AS day,kind,COUNT(*) AS total FROM events
+        WHERE substr(created_at,1,10)>=? GROUP BY day,kind ORDER BY day""",(start,)).fetchall()
+        grouped={}
+        for row in rows:grouped.setdefault(row["day"],{})[row["kind"]]=row["total"]
+        focus_rows=self.conn.execute("SELECT day,SUM(minutes) AS minutes FROM focus_sessions WHERE completed=1 AND day>=? GROUP BY day",(start,)).fetchall()
+        for row in focus_rows:grouped.setdefault(row["day"],{})["focus_minutes"]=row["minutes"]
+        return [{"day":(today-timedelta(days=i)).isoformat(),"quests":grouped.get((today-timedelta(days=i)).isoformat(),{}).get("quest_completed",0),
+        "habits":grouped.get((today-timedelta(days=i)).isoformat(),{}).get("habit_completed",0),
+        "goals":grouped.get((today-timedelta(days=i)).isoformat(),{}).get("goal_completed",0),
+        "focus_minutes":grouped.get((today-timedelta(days=i)).isoformat(),{}).get("focus_minutes",0)} for i in range(days-1,-1,-1)]
     def _import_legacy(self,path):
         if self.conn.execute("SELECT 1 FROM events WHERE kind='legacy_import' LIMIT 1").fetchone() or not path.exists():return
         try:
