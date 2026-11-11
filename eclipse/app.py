@@ -1,6 +1,6 @@
 """ECLIPSE 3.0 — a polished, local-first personal progression system."""
 from __future__ import annotations
-import os, sys
+import os, sys, base64, math
 from datetime import date, datetime
 from pathlib import Path
 import tkinter as tk
@@ -16,10 +16,22 @@ class EclipseApp:
         self.root=root;root.title("ECLIPSE 3.0 | Personal Progression System");root.geometry("1320x850");root.minsize(980,680);root.configure(bg=BG)
         self.data_dir=Path.home()/".eclipse";self.data_dir.mkdir(exist_ok=True)
         self.engine=EclipseEngine(self.data_dir/"eclipse_v2.db",Path.cwd()/"eclipse_save.json",Path.cwd()/"eclipse_v1.db")
-        self.brain=SystemBrain(self.engine);self.pages={};self.nav_buttons={};self.timer_job=None;self.timer_remaining=1500;self.timer_running=False
-        self._style();self._shell();self._build_pages();self.engine.log_session("app_opened","ECLIPSE opened on this device")
+        self.brain=SystemBrain(self.engine);self.pages={};self.page_containers={};self.nav_buttons={};self.timer_job=None;self.timer_remaining=1500;self.timer_elapsed=0;self.timer_running=False
+        self.app_icon=self._make_icon();root.iconphoto(True,self.app_icon);self._style();self._shell();self._build_pages();self.engine.log_session("app_opened","ECLIPSE opened on this device")
         self.refresh_all();self.show_page("dashboard");root.protocol("WM_DELETE_WINDOW",self.close)
         if self.engine.get_setting("auto_checkin","1")=="1":root.after(700,self._maybe_daily_checkin)
+    def _make_icon(self):
+        size=32;pixels=bytearray()
+        for y in range(size):
+            for x in range(size):
+                dx=x-16;dy=y-16;r=math.sqrt(dx*dx+dy*dy)
+                rgb=(9,13,24)
+                if 10.5<=r<=13.2:rgb=(155,140,255)
+                if r<=10.5:rgb=(28,47,72)
+                if ((x-18.5)**2+(y-14.5)**2<=8.5**2 and not ((x-22.5)**2+(y-10.5)**2<=8.5**2)):rgb=(119,229,232)
+                pixels.extend(rgb)
+        ppm=f"P6\\n{size} {size}\\n255\\n".encode()+bytes(pixels)
+        return tk.PhotoImage(data=base64.b64encode(ppm).decode("ascii"))
     def _style(self):
         s=ttk.Style();s.theme_use("clam")
         s.configure("Treeview",background=PANEL,fieldbackground=PANEL,foreground=TEXT,rowheight=34,borderwidth=0,font=(FONT,9))
@@ -58,7 +70,33 @@ class EclipseApp:
         self.content=tk.Frame(main,bg=BG);self.content.pack(fill="both",expand=True,padx=26,pady=(0,20))
         self.status=tk.Label(main,text="ECLIPSE 3.0  ·  DATA STORED ON THIS DEVICE",bg=BG,fg="#64748B",font=(FONT,7));self.status.pack(anchor="e",padx=28,pady=(0,9))
     def _page(self,key):
-        f=tk.Frame(self.content,bg=BG);self.pages[key]=f;return f
+        outer=tk.Frame(self.content,bg=BG)
+        canvas=tk.Canvas(outer,bg=BG,highlightthickness=0,bd=0)
+        scroll=ttk.Scrollbar(outer,orient="vertical",command=canvas.yview)
+        canvas.configure(yscrollcommand=scroll.set)
+        scroll.pack(side="right",fill="y");canvas.pack(side="left",fill="both",expand=True)
+        inner=tk.Frame(canvas,bg=BG)
+        window=canvas.create_window((0,0),window=inner,anchor="nw")
+        inner.bind("<Configure>",lambda _e,c=canvas:c.configure(scrollregion=c.bbox("all")))
+        canvas.bind("<Configure>",lambda e,c=canvas,w=window:c.itemconfigure(w,width=e.width))
+        canvas.bind("<Enter>",lambda _e,c=canvas:self._bind_page_wheel(c))
+        canvas.bind("<Leave>",lambda _e:self._unbind_page_wheel())
+        self.pages[key]=inner;self.page_containers[key]=outer
+        return inner
+    def _bind_page_wheel(self,canvas):
+        self._active_scroll_canvas=canvas
+        self.root.bind_all("<MouseWheel>",self._on_mousewheel)
+        self.root.bind_all("<Button-4>",self._on_mousewheel_linux)
+        self.root.bind_all("<Button-5>",self._on_mousewheel_linux)
+    def _unbind_page_wheel(self):
+        self.root.unbind_all("<MouseWheel>");self.root.unbind_all("<Button-4>");self.root.unbind_all("<Button-5>")
+    def _on_mousewheel(self,event):
+        canvas=getattr(self,"_active_scroll_canvas",None)
+        if canvas:
+            canvas.yview_scroll(int(-1*(event.delta/120)),"units")
+    def _on_mousewheel_linux(self,event):
+        canvas=getattr(self,"_active_scroll_canvas",None)
+        if canvas:canvas.yview_scroll(-1 if event.num==4 else 1,"units")
     def _label(self,p,text,size=10,color=TEXT,bold=False,bg=PANEL,**kw):
         return tk.Label(p,text=text,bg=bg,fg=color,font=(FONT,size,"bold" if bold else "normal"),**kw)
     def _card(self,p,title=None,subtitle=None,bg=PANEL):
@@ -161,6 +199,10 @@ class EclipseApp:
         tk.Checkbutton(daily,text="Include completed focus sessions in analysis",variable=self.include_focus_var,command=lambda:self._save_setting("include_focus",self.include_focus_var.get()),bg=PANEL,fg=TEXT,selectcolor=PANEL2,activebackground=PANEL,activeforeground=TEXT,font=(FONT,9)).pack(anchor="w",pady=3)
         self.include_habits_var=tk.IntVar(value=int(self.engine.get_setting("include_habits","1")))
         tk.Checkbutton(daily,text="Include habit check-ins in analysis",variable=self.include_habits_var,command=lambda:self._save_setting("include_habits",self.include_habits_var.get()),bg=PANEL,fg=TEXT,selectcolor=PANEL2,activebackground=PANEL,activeforeground=TEXT,font=(FONT,9)).pack(anchor="w",pady=3)
+        self.include_checkins_var=tk.IntVar(value=int(self.engine.get_setting("include_checkins","1")))
+        tk.Checkbutton(daily,text="Include daily pulse ratings in analysis",variable=self.include_checkins_var,command=lambda:self._save_setting("include_checkins",self.include_checkins_var.get()),bg=PANEL,fg=TEXT,selectcolor=PANEL2,activebackground=PANEL,activeforeground=TEXT,font=(FONT,9)).pack(anchor="w",pady=3)
+        self.include_goals_var=tk.IntVar(value=int(self.engine.get_setting("include_goals","1")))
+        tk.Checkbutton(daily,text="Include objective completions in analysis",variable=self.include_goals_var,command=lambda:self._save_setting("include_goals",self.include_goals_var.get()),bg=PANEL,fg=TEXT,selectcolor=PANEL2,activebackground=PANEL,activeforeground=TEXT,font=(FONT,9)).pack(anchor="w",pady=3)
         tk.Label(daily,text="Journal contents stay private and are never analysed.",bg=PANEL,fg=GOLD,font=(FONT,8)).pack(anchor="w",pady=(5,0))
         data=self._card(p,"BACKUP & MAINTENANCE","Protect your progress before moving or restoring data.");data.pack(fill="x",pady=6)
         row=tk.Frame(data,bg=PANEL);row.pack(anchor="w",pady=(10,0))
@@ -169,11 +211,17 @@ class EclipseApp:
         self.check_text=self._text(p,6);self.check_text.pack(fill="both",expand=True,pady=(10,0));self.check_text.insert("1.0","System diagnostics have not been run in this session.");self.check_text.configure(state="disabled")
     def show_page(self,key):
         if key not in self.pages:return
-        for page in self.pages.values():page.pack_forget()
-        self.pages[key].pack(fill="both",expand=True)
+        for page in self.page_containers.values():page.pack_forget()
+        self.page_containers[key].pack(fill="both",expand=True)
         self.page_title.configure(text=dict((k,label.title()) for label,k,_ in self.NAV).get(key,"ECLIPSE"))
         for k,b in self.nav_buttons.items():b.configure(bg=PANEL2 if k==key else SIDE,fg=ACCENT if k==key else MUTED)
-        if key=="settings":self.auto_start_var.set(int(self.engine.get_setting("auto_start","0")))
+        if key=="settings":
+            self.auto_start_var.set(int(self.engine.get_setting("auto_start","0")))
+            self.auto_checkin_var.set(int(self.engine.get_setting("auto_checkin","1")))
+            self.include_focus_var.set(int(self.engine.get_setting("include_focus","1")))
+            self.include_habits_var.set(int(self.engine.get_setting("include_habits","1")))
+            self.include_checkins_var.set(int(self.engine.get_setting("include_checkins","1")))
+            self.include_goals_var.set(int(self.engine.get_setting("include_goals","1")))
     def refresh_all(self):
         snap=self.brain.snapshot();player=snap["player"];days=int(self.engine.get_setting("analysis_window","7"));a=self.engine.analytics_snapshot(days)
         self.player_name.configure(text=player["name"].upper());self.player_rank.configure(text=f"RANK {player['rank']}  ·  LEVEL {player['level']}")
@@ -187,8 +235,8 @@ class EclipseApp:
             self.checkin_detail.configure(text=f"Mood {pulse['mood']}/5  ·  Energy {pulse['energy']}/5  ·  Focus {pulse['focus']}/5\nPriority: {pulse['priority'] or 'Not set'}")
         else:
             self.checkin_state.configure(text="NO CHECK-IN RECORDED TODAY",fg=GOLD);self.checkin_detail.configure(text="A quick pulse gives the System useful context. You can skip it.")
-        self._set_text(self.daily_insight,self.brain.daily_report(days,self.engine.get_setting('include_focus','1')=='1',self.engine.get_setting('include_habits','1')=='1'))
-        self._set_text(self.growth_text,self.brain.full_report(self.engine.get_setting("include_focus","1")=="1",self.engine.get_setting("include_habits","1")=="1",days))
+        self._set_text(self.daily_insight,self.brain.daily_report(days,self.engine.get_setting('include_focus','1')=='1',self.engine.get_setting('include_habits','1')=='1',self.engine.get_setting('include_checkins','1')=='1',self.engine.get_setting('include_goals','1')=='1'))
+        self._set_text(self.growth_text,self.brain.full_report(self.engine.get_setting("include_focus","1")=="1",self.engine.get_setting("include_habits","1")=="1",days,self.engine.get_setting("include_checkins","1")=="1",self.engine.get_setting("include_goals","1")=="1"))
         for tree in (self.quest_tree,self.goal_tree,self.habit_tree):
             for item in tree.get_children():tree.delete(item)
         for q in self.engine.quests():self.quest_tree.insert("","end",iid=str(q["id"]),values=(q["title"],q["category"],f"+{q['xp']} XP","RECORDED" if q["completed"] else "AVAILABLE"))
@@ -200,8 +248,13 @@ class EclipseApp:
         self._set_text(self.focus_recent,"\n".join(f"{s['day']}  ·  {s['minutes']} minutes  ·  {'COMPLETED' if s['completed'] else 'STOPPED'}" for s in self.engine.recent_focus_sessions(12)) or "No focus sessions recorded yet.")
         self.date_label.configure(text=date.today().strftime("%A  ·  %d %B %Y"))
     def _maybe_daily_checkin(self):
-        if self.engine.daily_checkin() is None and self.engine.get_setting("auto_checkin","1")=="1":self.open_daily_checkin()
+        today=date.today().isoformat()
+        if (self.engine.daily_checkin() is None and self.engine.get_setting("auto_checkin","1")=="1"
+                and self.engine.get_setting("last_checkin_prompt_date","")!=today):
+            self.engine.set_setting("last_checkin_prompt_date",today)
+            self.open_daily_checkin()
     def open_daily_checkin(self):
+        self.engine.set_setting("last_checkin_prompt_date",date.today().isoformat())
         old=self.engine.daily_checkin();win=tk.Toplevel(self.root);win.title("ECLIPSE | Daily pulse");win.configure(bg=BG);win.resizable(False,False);win.transient(self.root);win.grab_set();win.geometry("540x610")
         body=tk.Frame(win,bg=PANEL,padx=24,pady=22);body.pack(fill="both",expand=True,padx=14,pady=14)
         self._label(body,"DAILY SYSTEM PULSE",9,ACCENT,True,PANEL).pack(anchor="w");self._label(body,"How is today going?",20,TEXT,True,PANEL).pack(anchor="w",pady=(6,3))
@@ -266,9 +319,9 @@ class EclipseApp:
     def _show_timer(self):self.timer_display.configure(text=f"{self.timer_remaining//60:02d}:{self.timer_remaining%60:02d}")
     def _timer_tick(self):
         if not self.timer_running:return
-        self.timer_remaining-=1;self._show_timer()
+        self.timer_elapsed+=1;self.timer_remaining-=1;self._show_timer()
         if self.timer_remaining<=0:
-            self.timer_running=False;self.timer_job=None;mins=int(self.timer_choice.get().split()[0]);self.engine.record_focus_session(mins,True)
+            self.timer_running=False;self.timer_job=None;mins=int(self.timer_choice.get().split()[0]);self.engine.record_focus_session(mins,True);self.timer_elapsed=0
             self.timer_hint.configure(text="Session complete. Take a break if you need one.");self.refresh_all();self.root.bell()
             messagebox.showinfo("Focus Room","Focus session completed and recorded.",parent=self.root);return
         self.timer_job=self.root.after(1000,self._timer_tick)
@@ -280,8 +333,12 @@ class EclipseApp:
             self.timer_running=False
             if self.timer_job:self.root.after_cancel(self.timer_job);self.timer_job=None
             self.timer_hint.configure(text="Paused. Continue when you are ready.")
+    def _record_interrupted_focus(self):
+        minutes=self.timer_elapsed//60
+        if minutes>0:self.engine.record_focus_session(minutes,False)
+        self.timer_elapsed=0
     def reset_timer(self):
-        self.pause_timer();self.timer_remaining=int(self.timer_choice.get().split()[0])*60;self._show_timer();self.timer_hint.configure(text="Timer reset. Choose a comfortable pace.")
+        self.pause_timer();self._record_interrupted_focus();self.timer_remaining=int(self.timer_choice.get().split()[0])*60;self._show_timer();self.timer_hint.configure(text="Timer reset. Choose a comfortable pace.");self.refresh_all()
     def save_reflection(self):
         self.engine.save_reflection(self.journal_text.get("1.0","end").strip());self.refresh_all();messagebox.showinfo("Journal","Reflection saved locally.",parent=self.root)
     def _save_setting(self,key,value):
@@ -336,6 +393,8 @@ class EclipseApp:
             else:os.system(f'xdg-open "{self.data_dir}"')
         except Exception as exc:messagebox.showerror("Data folder",str(exc),parent=self.root)
     def close(self):
+        if self.timer_running:self.pause_timer()
+        self._record_interrupted_focus()
         if self.timer_job:
             try:self.root.after_cancel(self.timer_job)
             except Exception:pass
