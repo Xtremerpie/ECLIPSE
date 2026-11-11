@@ -1,13 +1,13 @@
-# Project structure
+# Project structure — ECLIPSE 3.1
 
-ECLIPSE 3.0 is a local-first Tkinter desktop application.
+ECLIPSE 3.1 is a local-first Tkinter desktop application.
 
-- eclipse/app.py: redesigned command-center UI, daily pulse, focus timer, Windows startup, and settings.
-- eclipse/engine.py: SQLite schema, progression rules, daily check-ins, focus sessions, analytics, backup and migration.
-- eclipse/brain.py: explainable daily reports based on explicitly recorded information.
-- tests/: automated engine and System Brain tests.
+- eclipse/app.py: command-centre UI, scrollable navigation, app icon, daily pulse, focus timer, Windows startup, settings, backup and diagnostics.
+- eclipse/engine.py: SQLite schema, progression rules, daily check-ins, focus records, period analytics, daily timeline, backup, import/export and migration.
+- eclipse/brain.py: explainable daily reports, previous-period comparisons, attributes, achievements, skills and story unlocks.
 - assets/eclipse-mark.svg: vector identity mark.
-- docs/: testing, release notes, and architecture.
-- legacy/: original prototype.
+- tests/: automated engine and System Brain tests.
+- docs/: testing, release notes and architecture.
+- legacy/: archived original prototype.
 
-The active database lives under the user's home directory in .eclipse/. No cloud services or external Python dependencies are used.
+The active database lives in the user's home directory under .eclipse/. No cloud services or external Python dependencies are used.
