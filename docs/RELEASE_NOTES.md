@@ -1,28 +1,34 @@
-# ECLIPSE 3.0 — Release notes
+# ECLIPSE 3.1 — Release notes
 
-## Personal Progression Command Center
-
-ECLIPSE 3.0 upgrades the previous V2 desktop interface and adds daily reflection and transparent personal analytics.
+## Complete Personal Progression Command Centre
 
 ### Interface
-- New dark command-center layout with a persistent navigation rail.
-- Custom ECLIPSE crescent mark and vector logo asset.
-- Dashboard hero panel, progression bar, and metric cards.
+- Dark command-centre layout with persistent navigation and scrollable pages.
+- Generated app icon and custom ECLIPSE crescent mark.
+- Dashboard progression, XP, rank, metrics, and eight live attribute bars.
 - Dedicated screens for directives, objectives, habits, focus, intelligence, story, journal, history, and settings.
 
-### Daily System Intelligence
-- Optional once-per-day startup pulse.
-- Mood, energy and focus self-ratings, plus a win, challenge and priority.
-- Rolling 7/14/30-day activity analysis.
-- Average self-reported pulse scores over the selected window.
-- Completed focus sessions and habit check-ins can be included or excluded.
-- Journal content is excluded from analysis.
+### Progression and focus
+- Daily generated and custom directives with one-time rewards.
+- Objectives remain active until the user manually confirms completion.
+- Daily habit check-ins, achievements, skills, and original story unlocks.
+- 5/15/25/45/60-minute focus timer.
+- Completed focus sessions are recorded; interrupted sessions of at least one minute are stored as stopped.
 
-### Desktop integration
-- Optional Windows sign-in startup through the user's Startup folder.
-- SQLite database remains local.
-- Existing V2 records are preserved by additive schema migration.
-- JSON export format 3 can still import V2 format 2 backups.
+### Daily System Intelligence
+- Optional once-per-date launch pulse. Skipping does not cause repeat prompts that same day.
+- Mood, energy and focus ratings, plus a win, challenge, and priority.
+- 7/14/30-day analysis windows and comparison with the previous equal-length period.
+- Recent daily activity timeline and average self-reported pulse ratings.
+- Separate controls for including focus, habits, pulse ratings, and objective completions.
+- Journal text is always excluded.
+
+### Desktop and data
+- Optional Windows sign-in startup through the current user's Startup folder.
+- Local SQLite database and V2 migration.
+- SQLite backups and portable JSON format 3 export.
+- Format 2 JSON import compatibility; restore creates a safety database backup.
+- No cloud account, API key, external Python packages, GPU, or network requirement.
 
 ### Boundaries
-ECLIPSE does not monitor the screen, keyboard, other apps, browsing, messages, or activity outside ECLIPSE. It cannot automatically verify goals or know how the user feels. Analytics are descriptive prompts, not diagnosis or a judgement of personal worth.
+ECLIPSE analyses only actions and check-ins explicitly recorded inside the app. It does not monitor the screen, keyboard, other applications, browsing, or messages. It cannot verify offline work or infer feelings. Analysis is descriptive, not a diagnosis or judgement.
