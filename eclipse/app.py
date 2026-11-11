@@ -142,6 +142,15 @@ class EclipseApp:
         self.checkin_detail=self._label(right,"Mood, energy and focus are optional signals—not grades.",8,MUTED,PANEL,justify="left",wraplength=360);self.checkin_detail.pack(anchor="w",pady=(0,14))
         row=tk.Frame(right,bg=PANEL);row.pack(anchor="w");self._button(row,"OPEN DAILY CHECK-IN",self.open_daily_checkin,"success").pack(side="left")
         self._button(row,"FULL ANALYSIS",lambda:self.show_page("growth"),"quiet").pack(side="left",padx=7)
+        attrs=self._card(p,"ATTRIBUTE MATRIX","Skills grow from recorded practice—not from comparison with anyone else.")
+        attrs.pack(fill="x",pady=(14,0));self.attribute_bars={}
+        grid=tk.Frame(attrs,bg=PANEL);grid.pack(fill="x",pady=(12,0))
+        for index,name in enumerate(ATTRIBUTES):
+            cell=tk.Frame(grid,bg=PANEL);cell.grid(row=index//2,column=index%2,sticky="ew",padx=(0,16),pady=6)
+            grid.grid_columnconfigure(index%2,weight=1)
+            tk.Label(cell,text=name.upper(),bg=PANEL,fg=MUTED,font=(FONT,8,"bold")).pack(anchor="w")
+            bar=ttk.Progressbar(cell,maximum=999,style="Eclipse.Horizontal.TProgressbar");bar.pack(fill="x",pady=(5,0))
+            self.attribute_bars[name]=bar
     def _build_quests(self):
         p=self._page("quests");self._heading(p,"Daily directives","Choose what matters today. Record a directive only after you have actually done it.")
         self.quest_tree=self._tree(p,("title","category","xp","state"),("DIRECTIVE","ATTRIBUTE","REWARD","STATUS"),(500,150,100,140),12)
@@ -228,6 +237,8 @@ class EclipseApp:
         self.hero_greeting.configure(text=f"WELCOME BACK, {player['name'].upper()}");self.level_line.configure(text=f"LEVEL {player['level']}  ·  RANK {player['rank']}")
         self.xp_line.configure(text=f"{player['level_xp']} / {player['next_xp']} XP TO NEXT LEVEL");self.level_bar["value"]=player["level_xp"]/player["next_xp"]*100
         self.metric_labels["xp"].configure(text=f"{player['xp']:,}");self.metric_labels["quests"].configure(text=str(a["quest_count"]))
+        for name,value in player["attributes"].items():
+            if name in self.attribute_bars:self.attribute_bars[name]["value"]=value
         self.metric_labels["habits"].configure(text=str(a["habit_count"] if self.engine.get_setting("include_habits","1")=="1" else 0));self.metric_labels["focus"].configure(text=f"{a['focus_minutes'] if self.engine.get_setting('include_focus','1')=='1' else 0}m")
         pulse=self.engine.daily_checkin()
         if pulse:
@@ -327,6 +338,8 @@ class EclipseApp:
         self.timer_job=self.root.after(1000,self._timer_tick)
     def start_timer(self):
         if self.timer_running:return
+        if self.timer_remaining<=0:
+            self.timer_remaining=int(self.timer_choice.get().split()[0])*60;self.timer_elapsed=0;self._show_timer()
         self.timer_running=True;self.timer_hint.configure(text="Timer running locally. Pause whenever you need.");self.timer_job=self.root.after(1000,self._timer_tick)
     def pause_timer(self):
         if self.timer_running:
