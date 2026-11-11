@@ -1,4 +1,5 @@
 import tempfile, unittest
+from datetime import date
 from pathlib import Path
 from eclipse.engine import EclipseEngine
 
@@ -36,6 +37,18 @@ class EngineV2Tests(unittest.TestCase):
   self.e.record_focus_session(25,True);self.e.log_session('app_opened','Test session')
   data=self.e.analytics_snapshot(7)
   self.assertEqual(data['focus_minutes'],25);self.assertGreaterEqual(data['session_count'],1)
+ def test_period_comparison_and_daily_timeline(self):
+  from datetime import date,timedelta
+  q=self.e.quests()[0];self.e.complete_quest(q['id'])
+  snap=self.e.analytics_snapshot(7)
+  self.assertEqual(snap['quest_count'],1);self.assertEqual(snap['previous_quest_count'],0)
+  timeline=self.e.activity_by_day(7)
+  self.assertEqual(len(timeline),7);self.assertEqual(sum(x['quests'] for x in timeline),1)
+ def test_daily_prompt_setting_persists(self):
+  self.e.set_setting('last_checkin_prompt_date',date.today().isoformat())
+  self.assertEqual(self.e.get_setting('last_checkin_prompt_date'),date.today().isoformat())
+  self.e.set_setting('include_checkins','0')
+  self.assertEqual(self.e.get_setting('include_checkins'),'0')
  def test_v2_export_import_compatibility(self):
   import json
   out=self.root/'v2.json';tables={}
