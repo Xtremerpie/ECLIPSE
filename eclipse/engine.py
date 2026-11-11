@@ -37,7 +37,7 @@ class EclipseEngine:
     def _seed(self):
         self.conn.execute("INSERT OR IGNORE INTO player(id,name,created_at) VALUES(1,'Player',?)",(datetime.now().isoformat(timespec="seconds"),))
         for a in ATTRIBUTES:self.conn.execute("INSERT OR IGNORE INTO attributes(name,value) VALUES(?,1)",(a,))
-        defaults={"auto_checkin":"1","auto_start":"0","analysis_window":"7","include_focus":"1","include_habits":"1"}
+        defaults={"auto_checkin":"1","auto_start":"0","analysis_window":"7","include_focus":"1","include_habits":"1","include_checkins":"1","include_goals":"1","last_checkin_prompt_date":""}
         for k,v in defaults.items():self.conn.execute("INSERT OR IGNORE INTO app_settings(key,value) VALUES(?,?)",(k,v))
         self.conn.commit();self.ensure_daily_quests()
     def _event(self,k,d):self.conn.execute("INSERT INTO events(kind,detail,created_at) VALUES(?,?,?)",(k,d,datetime.now().isoformat(timespec="seconds")))
