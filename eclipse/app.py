@@ -31,11 +31,11 @@ class EclipseApp:
                 if r<=10.5:rgb=(28,47,72)
                 if ((x-18.5)**2+(y-14.5)**2<=8.5**2 and not ((x-22.5)**2+(y-10.5)**2<=8.5**2)):rgb=(119,229,232)
                 row.extend(rgb)
-            rows.append(b"\\x00"+bytes(row))
+            rows.append(bytes([0])+bytes(row))
         def chunk(kind,data):
             payload=kind+data
             return struct.pack(">I",len(data))+payload+struct.pack(">I",zlib.crc32(payload)&0xffffffff)
-        png=b"\\x89PNG\\r\\n\\x1a\\n"+chunk(b"IHDR",struct.pack(">2I5B",size,size,8,2,0,0,0))+chunk(b"IDAT",zlib.compress(b"".join(rows),9))+chunk(b"IEND",b"")
+        png=bytes([137,80,78,71,13,10,26,10])+chunk(b"IHDR",struct.pack(">2I5B",size,size,8,2,0,0,0))+chunk(b"IDAT",zlib.compress(b"".join(rows),9))+chunk(b"IEND",b"")
         return tk.PhotoImage(data=base64.b64encode(png).decode("ascii"),format="png")
     def _style(self):
         s=ttk.Style();s.theme_use("clam")
