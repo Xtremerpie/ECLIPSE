@@ -1,10 +1,10 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title ECLIPSE 3.0
+title ECLIPSE 3.1
 echo.
 echo  ==========================================
-echo          E C L I P S E   2.0
+echo          E C L I P S E   3.1
 echo          PERSONAL PROGRESSION SYSTEM
 echo  ==========================================
 echo.
