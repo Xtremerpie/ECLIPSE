@@ -1,6 +1,6 @@
 """ECLIPSE 3.1 — a polished, local-first personal progression system."""
 from __future__ import annotations
-import os, sys, base64, math
+import os, sys, base64, math, shutil
 from datetime import date, datetime
 from pathlib import Path
 import tkinter as tk
@@ -360,10 +360,15 @@ class EclipseApp:
         startup=Path(os.environ.get("APPDATA",""))/"Microsoft"/"Windows"/"Start Menu"/"Programs"/"Startup";startup.mkdir(parents=True,exist_ok=True);vbs=startup/"ECLIPSE_STARTUP.vbs"
         if not enabled:vbs.unlink(missing_ok=True);return
         pythonw=Path(sys.executable).with_name("pythonw.exe")
-        if not pythonw.exists():raise RuntimeError("pythonw.exe was not found beside this Python installation.")
+        if pythonw.exists():
+            executable=str(pythonw);arguments=" -m eclipse"
+        else:
+            pyw=shutil.which("pyw")
+            if not pyw:raise RuntimeError("Neither pythonw.exe nor the Windows pyw launcher was found.")
+            executable=pyw;arguments=f" -{sys.version_info.major}.{sys.version_info.minor} -m eclipse"
         project=Path(__file__).resolve().parent.parent
-        qproj=str(project).replace('"','""');qpython=str(pythonw).replace('"','""')
-        vbs.write_text('Set shell = CreateObject("WScript.Shell")\n'+f'shell.CurrentDirectory = "{qproj}"\n'+f'shell.Run """{qpython}"" -m eclipse", 0, False\n',encoding="utf-8")
+        qproj=str(project).replace('"','""');qexe=executable.replace('"','""')
+        vbs.write_text('Set shell = CreateObject("WScript.Shell")\\n'+f'shell.CurrentDirectory = "{qproj}"\\n'+f'shell.Run Chr(34) & "{qexe}" & Chr(34) & "{arguments}", 0, False\\n',encoding="utf-8")
     def rename_player(self):
         name=simpledialog.askstring("Player profile","Choose your player name:",initialvalue=self.engine.player()["name"],parent=self.root)
         if name:self.engine.rename_player(name);self.refresh_all()
