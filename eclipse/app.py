@@ -16,7 +16,7 @@ class EclipseApp:
         self.root=root;root.title("ECLIPSE 3.1 | Personal Progression System");root.geometry("1320x850");root.minsize(980,680);root.configure(bg=BG)
         self.data_dir=Path.home()/".eclipse";self.data_dir.mkdir(exist_ok=True)
         self.engine=EclipseEngine(self.data_dir/"eclipse_v2.db",Path.cwd()/"eclipse_save.json",Path.cwd()/"eclipse_v1.db")
-        self.brain=SystemBrain(self.engine);self.pages={};self.page_containers={};self.nav_buttons={};self.timer_job=None;self.timer_remaining=1500;self.timer_elapsed=0;self.timer_running=False
+        self.brain=SystemBrain(self.engine);self.pages={};self.page_containers={};self.page_canvases={};self.nav_buttons={};self.timer_job=None;self.timer_remaining=1500;self.timer_elapsed=0;self.timer_running=False
         self.app_icon=self._make_icon();root.iconphoto(True,self.app_icon);self._style();self._shell();self._build_pages();self.engine.log_session("app_opened","ECLIPSE opened on this device")
         self.refresh_all();self.show_page("dashboard");root.protocol("WM_DELETE_WINDOW",self.close)
         if self.engine.get_setting("auto_checkin","1")=="1":root.after(700,self._maybe_daily_checkin)
@@ -79,22 +79,16 @@ class EclipseApp:
         window=canvas.create_window((0,0),window=inner,anchor="nw")
         inner.bind("<Configure>",lambda _e,c=canvas:c.configure(scrollregion=c.bbox("all")))
         canvas.bind("<Configure>",lambda e,c=canvas,w=window:c.itemconfigure(w,width=e.width))
-        canvas.bind("<Enter>",lambda _e,c=canvas:self._bind_page_wheel(c))
-        canvas.bind("<Leave>",lambda _e:self._unbind_page_wheel())
-        self.pages[key]=inner;self.page_containers[key]=outer
+        self.pages[key]=inner;self.page_containers[key]=outer;self.page_canvases[key]=canvas
         return inner
-    def _bind_page_wheel(self,canvas):
-        self._active_scroll_canvas=canvas
-        self.root.bind_all("<MouseWheel>",self._on_mousewheel)
-        self.root.bind_all("<Button-4>",self._on_mousewheel_linux)
-        self.root.bind_all("<Button-5>",self._on_mousewheel_linux)
-    def _unbind_page_wheel(self):
-        self.root.unbind_all("<MouseWheel>");self.root.unbind_all("<Button-4>");self.root.unbind_all("<Button-5>")
     def _on_mousewheel(self,event):
+        widget_class=event.widget.winfo_class()
+        if widget_class in ("Text","Treeview","Entry","TEntry","TCombobox","Spinbox"):return
         canvas=getattr(self,"_active_scroll_canvas",None)
-        if canvas:
-            canvas.yview_scroll(int(-1*(event.delta/120)),"units")
+        if canvas:canvas.yview_scroll(int(-1*(event.delta/120)),"units")
     def _on_mousewheel_linux(self,event):
+        widget_class=event.widget.winfo_class()
+        if widget_class in ("Text","Treeview","Entry","TEntry","TCombobox","Spinbox"):return
         canvas=getattr(self,"_active_scroll_canvas",None)
         if canvas:canvas.yview_scroll(-1 if event.num==4 else 1,"units")
     def _label(self,p,text,size=10,color=TEXT,bold=False,bg=PANEL,**kw):
@@ -221,6 +215,7 @@ class EclipseApp:
     def show_page(self,key):
         if key not in self.pages:return
         for page in self.page_containers.values():page.pack_forget()
+        self._active_scroll_canvas=self.page_canvases[key]
         self.page_containers[key].pack(fill="both",expand=True)
         self.page_title.configure(text=dict((k,label.title()) for label,k,_ in self.NAV).get(key,"ECLIPSE"))
         for k,b in self.nav_buttons.items():b.configure(bg=PANEL2 if k==key else SIDE,fg=ACCENT if k==key else MUTED)
