@@ -1,6 +1,6 @@
 """ECLIPSE 3.1 — a polished, local-first personal progression system."""
 from __future__ import annotations
-import os, sys, base64, math, shutil
+import os, sys, base64, math, shutil, struct, zlib
 from datetime import date, datetime
 from pathlib import Path
 import tkinter as tk
@@ -21,17 +21,22 @@ class EclipseApp:
         self.refresh_all();self.show_page("dashboard");root.protocol("WM_DELETE_WINDOW",self.close)
         if self.engine.get_setting("auto_checkin","1")=="1":root.after(700,self._maybe_daily_checkin)
     def _make_icon(self):
-        size=32;pixels=bytearray()
+        size=32;rows=[]
         for y in range(size):
+            row=bytearray()
             for x in range(size):
                 dx=x-16;dy=y-16;r=math.sqrt(dx*dx+dy*dy)
                 rgb=(9,13,24)
                 if 10.5<=r<=13.2:rgb=(155,140,255)
                 if r<=10.5:rgb=(28,47,72)
                 if ((x-18.5)**2+(y-14.5)**2<=8.5**2 and not ((x-22.5)**2+(y-10.5)**2<=8.5**2)):rgb=(119,229,232)
-                pixels.extend(rgb)
-        ppm=f"P6\\n{size} {size}\\n255\\n".encode()+bytes(pixels)
-        return tk.PhotoImage(data=base64.b64encode(ppm).decode("ascii"))
+                row.extend(rgb)
+            rows.append(b"\\x00"+bytes(row))
+        def chunk(kind,data):
+            payload=kind+data
+            return struct.pack(">I",len(data))+payload+struct.pack(">I",zlib.crc32(payload)&0xffffffff)
+        png=b"\\x89PNG\\r\\n\\x1a\\n"+chunk(b"IHDR",struct.pack(">2I5B",size,size,8,2,0,0,0))+chunk(b"IDAT",zlib.compress(b"".join(rows),9))+chunk(b"IEND",b"")
+        return tk.PhotoImage(data=base64.b64encode(png).decode("ascii"),format="png")
     def _style(self):
         s=ttk.Style();s.theme_use("clam")
         s.configure("Treeview",background=PANEL,fieldbackground=PANEL,foreground=TEXT,rowheight=34,borderwidth=0,font=(FONT,9))
